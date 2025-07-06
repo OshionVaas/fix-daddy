@@ -1,0 +1,104 @@
+// src/pages/AdminBookingsList.jsx
+import React, { useEffect, useState } from "react";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../firebase";
+
+const AdminBookingsList = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "bookings"), (snapshot) => {
+      const fetched = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setBookings(fetched.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds));
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleUpdate = async (id, field, value) => {
+    try {
+      const docRef = doc(db, "bookings", id);
+      await updateDoc(docRef, { [field]: value });
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-800">📋 Admin Booking List</h2>
+
+        {loading ? (
+          <p className="text-center text-gray-600">Loading bookings...</p>
+        ) : (
+          <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+            <table className="min-w-full table-auto text-sm text-gray-700">
+              <thead className="bg-blue-100 text-left">
+                <tr>
+                  <th className="px-4 py-2">#</th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Service</th>
+                  <th className="px-4 py-2">Message</th>
+                  <th className="px-4 py-2">Created At</th>
+                  <th className="px-4 py-2">Customer ID</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.map((b, index) => (
+                  <tr key={b.id} className="border-b">
+                    <td className="px-4 py-2 font-medium">{index + 1}</td>
+                    <td className="px-4 py-2">{b.name}</td>
+                    <td className="px-4 py-2">{b.phone}</td>
+                    <td className="px-4 py-2">{b.service}</td>
+                    <td className="px-4 py-2">{b.message}</td>
+                    <td className="px-4 py-2">
+                      {b.createdAt?.toDate().toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 font-mono text-blue-700">{b.customerId}</td>
+                    <td className="px-4 py-2">
+                      <select
+                        value={b.status || "In Progress"}
+                        onChange={(e) => handleUpdate(b.id, "status", e.target.value)}
+                        className="border px-2 py-1 rounded"
+                      >
+                        {["Received", "In Progress", "Testing", "Completed", "Delivered"].map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        type="text"
+                        value={b.note || ""}
+                        onChange={(e) => handleUpdate(b.id, "note", e.target.value)}
+                        className="border px-2 py-1 rounded w-full"
+                        placeholder="Add note"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminBookingsList;
