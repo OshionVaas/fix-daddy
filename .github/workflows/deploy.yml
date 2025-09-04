@@ -17,6 +17,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend   # 👈 run everything from frontend/
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +31,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install   # use install instead of ci for flexibility
 
       - name: Build site
         run: npm run build
@@ -38,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: frontend/dist   # 👈 path points to frontend/dist
 
   deploy:
     needs: build
