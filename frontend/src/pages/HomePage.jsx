@@ -1,3 +1,4 @@
+// src/pages/HomePage.jsx
 import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -28,11 +29,33 @@ const HomePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const message = `Repair Request:%0AService: ${formData.service}%0ADescription: ${formData.description}%0AName: ${formData.name}%0APhone: ${formData.phone}`;
-    window.open(`https://wa.me/94770366169?text=${message}`, "_blank");
+    const message = `Repair Request:
+Service: ${formData.service}
+Description: ${formData.description}
+Name: ${formData.name}
+Phone: ${formData.phone}`;
+
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/94770366169?text=${encoded}`, "_blank");
+
     setFormData({ name: "", phone: "", service: "", description: "" });
     setStep(1);
   };
+
+  // All icons are served from /public/icons
+  const repairItems = [
+    { icon: "/icons/Fans.png", label: "Fans" },
+    { icon: "/icons/Blenders.png", label: "Blenders" },
+    { icon: "/icons/Rice cookers and toasters.png", label: "Rice Cooks & Toasters" },
+    { icon: "/icons/Washing machine.png", label: "Wash Machines" },
+    { icon: "/icons/Mixers.png", label: "Mixers" },
+    { icon: "/icons/Overn.png", label: "Overs" }, // keep exact filename you have
+    { icon: "/icons/Pumps.png", label: "Types of Pumps" },
+    { icon: "/icons/Vacuum Cleaners.png", label: "Vacuum Cleaners" },
+    { icon: "/icons/Motor winding.png", label: "Motor winding" },
+    { icon: "/icons/Trimmers.png", label: "Trimmers" },
+    { icon: "/icons/Grinders and Drill.png", label: "Grinders & Drill machines" },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-gray-800 font-sans">
@@ -56,7 +79,9 @@ const HomePage = () => {
 
       {/* ✅ Why Choose Fix Daddy */}
       <section className="py-16 bg-gray-900 text-white">
-        <h2 className="text-4xl font-extrabold text-yellow-400 mb-8 text-center">Why Choose Fix Daddy</h2>
+        <h2 className="text-4xl font-extrabold text-yellow-400 mb-8 text-center">
+          Why Choose Fix Daddy
+        </h2>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {["🚀", "✅", "💎", "🧰", "😊", "🌱"].map((icon, i) => (
             <div
@@ -91,23 +116,11 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ✅ What We Repair (Updated with Modern Card Style) */}
+      {/* ✅ What We Repair */}
       <section className="py-16 px-6 bg-gray-100" data-aos="fade-up">
         <h3 className="text-3xl font-bold text-center mb-10">What We Repair</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {[
-            { icon: "Fans.png", label: "Fans" },
-            { icon: "Blenders.png", label: "Blenders" },
-            { icon: "Rice cookers and toasters.png", label: "Rice Cooks & Toasters" },
-            { icon: "Washing machine.png", label: "Wash Machines" },
-            { icon: "Mixers.png", label: "Mixers" },
-            { icon: "Overn.png", label: "Overs" },
-            { icon: "Pumps.png", label: "Types of Pumps" },
-            { icon: "Vacuum Cleaners.png", label: "Vacuum Cleaners" },
-            { icon: "Motor winding.png", label: "Motor winding" },
-            { icon: "Trimmers.png", label: "Trimmers" },
-            { icon: "Grinders and Drill.png", label: "Grinders & Drill machines" },
-          ].map((item, i) => (
+          {repairItems.map((item, i) => (
             <div
               key={i}
               className="relative h-48 w-full overflow-hidden rounded-xl shadow hover:shadow-lg transition duration-300 group"
@@ -115,11 +128,12 @@ const HomePage = () => {
               data-aos-delay={i * 100}
             >
               <img
-                src={`/icons/${item.icon}`}
+                src={item.icon}
                 alt={item.label}
+                loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 transform group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end justify-center p-4">
+              <div className="absolute inset-0 bg-black/40 flex items-end justify-center p-4">
                 <h4 className="text-white text-lg font-semibold text-center">{item.label}</h4>
               </div>
             </div>
@@ -163,7 +177,11 @@ const HomePage = () => {
                 />
               </div>
 
-              <button type="button" onClick={handleNext} className="bg-green-500 px-6 py-2 rounded font-semibold">
+              <button
+                type="button"
+                onClick={handleNext}
+                className="bg-green-500 px-6 py-2 rounded font-semibold"
+              >
                 Next
               </button>
             </>
