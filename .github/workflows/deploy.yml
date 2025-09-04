@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend   # 👈 run everything from frontend/
-
+        working-directory: frontend   # run npm from /frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,19 +29,22 @@ jobs:
         with:
           node-version: 20
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5   # <-- REQUIRED for Pages
+
       - name: Install dependencies
-        run: npm install   # use install instead of ci for flexibility
+        run: npm install
 
       - name: Build site
         run: npm run build
 
-      - name: Copy 404.html for SPA routing
+      - name: SPA fallback (React Router)
         run: cp dist/index.html dist/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist   # 👈 path points to frontend/dist
+          path: frontend/dist            # artifact path is /frontend/dist
 
   deploy:
     needs: build
