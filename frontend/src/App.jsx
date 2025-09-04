@@ -1,16 +1,10 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CustomerLookup from './pages/CustomerLookup';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminLogin from './pages/AdminLogin';
-import TechnicianDashboard from './pages/TechnicianDashboard';
-import TechnicianView from './pages/TechnicianView';
-import TechnicianLogin from './pages/TechnicianLogin';
 import ServicesPage from './pages/ServicesPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
-import RequireAuth from './components/RequireAuth';
 import NavBar from './components/NavBar';
 
 function App() {
@@ -25,26 +19,16 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/customerLookup" element={<CustomerLookup />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={
-          <RequireAuth>
-            <AdminDashboard />
-          </RequireAuth>
-        } />
-        <Route path="/technicians" element={
-          <RequireAuth>
-            <TechnicianDashboard />
-          </RequireAuth>
-        } />
+        {/* Block old admin/technician entry points */}
+        <Route path="/admin-login" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/" replace />} />
+        <Route path="/technician-login" element={<Navigate to="/" replace />} />
+        <Route path="/technicians/*" element={<Navigate to="/" replace />} />
+        <Route path="/technician/:techId" element={<Navigate to="/" replace />} />
 
-        {/* Technician Routes */}
-        <Route path="/technician-login" element={<TechnicianLogin />} />
-        <Route path="/technician/:techId" element={
-          <RequireAuth>
-            <TechnicianView />
-          </RequireAuth>
-        } />
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
