@@ -17,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend   # run npm from /frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,21 +27,36 @@ jobs:
           node-version: 20
 
       - name: Configure Pages
-        uses: actions/configure-pages@v5   # <-- REQUIRED for Pages
+        uses: actions/configure-pages@v5
+
+      # --- DEBUG: show workspace layout ---
+      - name: Print workspace tree
+        run: |
+          pwd
+          ls -la
+          ls -la frontend || true
 
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm install
 
       - name: Build site
+        working-directory: ./frontend
         run: npm run build
 
+      # --- DEBUG: confirm dist exists and list it ---
+      - name: Check dist
+        run: |
+          ls -la frontend/dist || true
+
       - name: SPA fallback (React Router)
+        working-directory: ./frontend
         run: cp dist/index.html dist/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist            # artifact path is /frontend/dist
+          path: frontend/dist
 
   deploy:
     needs: build
